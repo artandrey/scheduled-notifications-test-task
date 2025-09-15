@@ -1,0 +1,11 @@
+{
+  "name": "scheduled-notifications-test-task",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "scripts": {
+    "db:generate": "pnpm --filter users run db:generate",
+    "db:push": "pnpm --filter users run db:push"
+  }
+}

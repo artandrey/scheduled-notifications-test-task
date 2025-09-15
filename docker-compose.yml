@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: users-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - users-postgres-data:/var/lib/postgresql/data
+
+  notifications-scheduler-postgres:
+    image: postgres:latest
+    container_name: notifications-scheduler-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: notifications-scheduler
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5433:5433'
+    volumes:
+      - notifications-scheduler-postgres-data:/var/lib/postgresql/data
+
+  notifications-sender-postgres:
+    image: postgres:latest
+    container_name: notifications-sender-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: notifications-sender
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5434:5432'
+    volumes:
+      - notifications-sender-postgres-data:/var/lib/postgresql/data
+
+  app-postgres:
+    image: postgres:latest
+    container_name: app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5435:5432'
+    volumes:
+      - app-postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-server
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - '5672:5672' # AMQP port
+      - '15672:15672' # Management UI port
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'check_port_connectivity']
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+volumes:
+  users-postgres-data:
+    driver: local
+  notifications-scheduler-postgres-data:
+    driver: local
+  notifications-sender-postgres-data:
+    driver: local
+  app-postgres-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
